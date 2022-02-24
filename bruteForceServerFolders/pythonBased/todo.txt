@@ -1,0 +1,1 @@
+check for errorno = -3 ==> das heisst, dass der rechner kein Internet hat
