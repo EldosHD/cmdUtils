@@ -1,4 +1,4 @@
 # cmdUtils
 
-just a place for me to store my cmdutils
+just a repo for me to store my cmdutils
 ignore me ~nyaa
