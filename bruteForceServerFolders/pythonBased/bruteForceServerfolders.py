@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import requests
 import os
 from itertools import chain, product
@@ -23,7 +24,7 @@ def getCurrentTime():
         t = t + '_' + str(atr)
     return(t)
 
-directoryName = 'Brute Force Results'
+directoryName = 'BruteForceResults'
 directoryNameHelp = 'Uses the specified directory to store the results of the brute force attempt. The default name is "Brute Force Results".'
 fileName = 'Url_Finder' + getCurrentTime() + '.txt'
 fileNameHelp = 'Uses the specified file to store the results of the brute force attempt. The default name is Url_theCurrenTime.txt.'
