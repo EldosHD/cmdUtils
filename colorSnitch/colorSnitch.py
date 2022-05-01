@@ -1,7 +1,8 @@
 import sys
 import re
 import argparse
-
+import select
+import os
 
 class color:
     PURPLE = '\033[95m'
@@ -28,9 +29,20 @@ parser.add_argument('--count', action='store_true', default=False, help='Print t
 
 args = parser.parse_args()
 
-
 snitchOutput = []
-for line in sys.stdin:
+# here still list
+print('first: ' + str(type(snitchOutput)))
+
+if select.select([sys.stdin, ], [], [], 0.0)[0]:
+    # There is data in the 'stdin'
+    snitchOutput = sys.stdin
+else:
+    snitchOutput = os.system('snitch list')
+
+# here not a list anymore
+print('2nd: ' + str(type(snitchOutput)))
+    
+for line in snitchOutput:
     snitchOutput.append(line.replace('\n',''))
 
 for line in snitchOutput:
@@ -46,7 +58,7 @@ for line in snitchOutput:
     for index, word in enumerate(toDo):
         if re.search('TODOOO+',word):
             if args.count == True:
-                newWord = color.RED + calcToDoPrio(word) + color.END
+                newWord = "Prio: " + color.RED + calcToDoPrio(word) + color.END
             else:
                 newWord = re.search('TODOOO+', word)
                 newWord = color.RED + newWord.group() + color.END
@@ -54,7 +66,7 @@ for line in snitchOutput:
             break
         elif re.search('TODOO',word):
             if args.count == True:
-                newWord = color.YELLOW + calcToDoPrio(word) + color.END
+                newWord = "Prio: " + color.YELLOW + calcToDoPrio(word) + color.END
             else:
                 newWord = re.search('TODOO', word)
                 newWord = color.YELLOW + newWord.group() + color.END
@@ -62,7 +74,7 @@ for line in snitchOutput:
             break
         elif re.search('TODO', word):
             if args.count == True:
-                newWord = color.GREEN + calcToDoPrio(word) + color.END
+                newWord = 'Prio: ' + color.GREEN + calcToDoPrio(word) + color.END
             else:
                 newWord = re.search('TODO', word)
                 newWord = color.GREEN + newWord.group() + color.END
