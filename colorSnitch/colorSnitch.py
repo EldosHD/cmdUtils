@@ -1,8 +1,9 @@
+#!/usr/bin/python3
 import sys
 import re
 import argparse
-import select
-import os
+from os import isatty
+from subprocess import check_output
 
 class color:
     PURPLE = '\033[95m'
@@ -22,7 +23,6 @@ def calcToDoPrio(inputString: str):
 
 parser = argparse.ArgumentParser(description='TODO: describe that')
 
-# TODOOOOO: make this program run snitch if it doesnt get input
 parser.add_argument('-r','--run', action='store_true', default=False, help='run "snitch list" and use it as input')
 parser.add_argument('--count', action='store_true', default=False, help='Print the priority')
 
@@ -30,20 +30,20 @@ parser.add_argument('--count', action='store_true', default=False, help='Print t
 args = parser.parse_args()
 
 snitchOutput = []
-# here still list
-print('first: ' + str(type(snitchOutput)))
 
-if select.select([sys.stdin, ], [], [], 0.0)[0]:
-    # There is data in the 'stdin'
-    snitchOutput = sys.stdin
+if isatty(sys.stdin.fileno()):
+    # the script doesnt get input from a pipe
+    if args.run == True:
+        # run script
+        snitchOutput = check_output(['snitch','list'],text=True).split('\n')
+        snitchOutput.pop() # last element is empty for some reason
+    else:
+        print('Use the -r option to run snitch list, or pipe the output of snitch list to this program')
+        sys.exit()
 else:
-    snitchOutput = os.system('snitch list')
-
-# here not a list anymore
-print('2nd: ' + str(type(snitchOutput)))
-    
-for line in snitchOutput:
-    snitchOutput.append(line.replace('\n',''))
+    # the script gets input
+    for line in sys.stdin:
+        snitchOutput.append(line.replace('\n',''))
 
 for line in snitchOutput:
     toDo = line.split(':')
