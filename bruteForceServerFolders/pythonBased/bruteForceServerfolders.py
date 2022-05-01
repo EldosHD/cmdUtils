@@ -24,7 +24,7 @@ def getCurrentTime():
         t = t + '_' + str(atr)
     return(t)
 
-directoryName = 'BruteForceResults'
+directoryName = 'Results'
 directoryNameHelp = 'Uses the specified directory to store the results of the brute force attempt. The default name is "Brute Force Results".'
 fileName = 'Url_Finder' + getCurrentTime() + '.txt'
 fileNameHelp = 'Uses the specified file to store the results of the brute force attempt. The default name is Url_theCurrenTime.txt.'
@@ -34,8 +34,9 @@ url = ''
 urlHelp = 'Uses the specified Url as the base for the brute force attempt. This must be a complete link like https://www.google.com/. The https:// must be included.'
 characterList = string.ascii_letters
 characterListHelp = 'The default list are the upper and lowercase ascii letters. If you want to specify your own character List you can combine the following: l for lowercase, u for uppercase, d for digits, p for punktuation or a for all of them.'
-Color = False
-ColorHelp = 'This is false by default. Use the -n flag to disable it. The script will use color codes (https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal) to dye the output in case an Url is found. This only works with an registry Tweak on Windows.'
+ColorHelp = 'The script will use color codes (https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal) to dye the output in case an Url is found. The --no-color option disables that. This only works with an registry Tweak on Windows.'
+
+urlsFound = 0
 
 def bruteforce(charset, maxlength):
     return (''.join(candidate)
@@ -47,14 +48,17 @@ def checkIfFolderExists(folder):
         os.mkdir(folder)
 
 def checkUrl(url,dName,fName):
+    global urlsFound # so that the variable can be used in the function, since it is outside the scope
     r = requests.get(url)
     if (r.status_code >= 200 and r.status_code <= 299):             #r.status_code --> Http responsecode (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
-        print(bcolors.OKGREEN + '----------found Url: ' + url + '----------' + bcolors.ENDC)
+        urlsFound = urlsFound + 1
+        print(bcolors.OKGREEN + '----------found Url: ' + url +'----------' + bcolors.ENDC)
         f = open(dName + '/' + fName, 'at')            #opens File/creates it if it doesnt exist already and writes URL in it
         f.write(url + '\n')
         f.close
     else:
-        print('checking Url: ' + url +' -- Did not work.')
+        print('checking Url: ' + url +' -- Did not work.' + 'Urls found: '+ str(urlsFound))
+        
 def main(characterList):
     parser = argparse.ArgumentParser()      #automaticly creates a help message! Thats FUCKING AWESOME!!!
     parser.add_argument('-d','--directory-name', help=directoryNameHelp, default=directoryName)
@@ -62,14 +66,15 @@ def main(characterList):
     parser.add_argument('-m','--max-length', help=maxLengthHelp, type=int, default=maxLength)
     parser.add_argument('url',help=urlHelp)
     parser.add_argument('-c', '--character-list', help=characterListHelp, default=characterList)
-    parser.add_argument('--color-mode',help=ColorHelp, default=Color, action='store_true')
+    parser.add_argument('-n','--no-color',help=ColorHelp, default=False, action='store_true')
 
     args = parser.parse_args()
+    
     print('Base Url: ' + args.url)
     
     checkIfFolderExists(args.directory_name) #checks if the resultsfolder exists
 
-    if args.color_mode == False:
+    if args.no_color == True:
         bcolors.OKGREEN = ''
         bcolors.ENDC = ''
 
