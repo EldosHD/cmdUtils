@@ -24,3 +24,4 @@ NOTE: The binary was build under `Ubuntu 20.04` with `Python3.8.10`. To build th
 pip install pyinstaller
 pyinstaller --onefile colorSnitch.py
 ```
+The binary will be placed in the `dist` folder.
