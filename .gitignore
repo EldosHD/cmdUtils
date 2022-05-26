@@ -1,2 +1,5 @@
 *.*~
 bruteForceServerFolders/pythonBased/Results/
+*/build/
+*/dist/
+colorSnitch/colorSnitch.spec
