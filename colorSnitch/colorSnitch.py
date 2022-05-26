@@ -20,8 +20,12 @@ class color:
 def calcToDoPrio(inputString: str):
     return str(inputString.count('O') - 1)
 
+progDescribtion = '''This program is used to format the output of the program snitch by Tsoding. (https://github.com/tsoding/snitch)
+You can either pipe the output of snitch directly to this program or use the -r flag to run 'snitch list' with this script.
+NOTE: This program needs snitch to be installed, but doesn't come with it. Please install snitch manually.'''
 
-parser = argparse.ArgumentParser(description='TODO: describe that')
+
+parser = argparse.ArgumentParser(description=progDescribtion)
 
 parser.add_argument('-r','--run', action='store_true', default=False, help='run "snitch list" and use it as input')
 parser.add_argument('--count', action='store_true', default=False, help='Print the priority')
