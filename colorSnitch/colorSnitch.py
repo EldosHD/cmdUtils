@@ -5,6 +5,8 @@ import argparse
 from os import isatty
 from subprocess import check_output
 
+version = 1.0
+
 class color:
     PURPLE = '\033[95m'
     CYAN = '\033[96m'
@@ -25,10 +27,11 @@ You can either pipe the output of snitch directly to this program or use the -r 
 NOTE: This program needs snitch to be installed, but doesn't come with it. Please install snitch manually.'''
 
 
-parser = argparse.ArgumentParser(description=progDescribtion)
+parser = argparse.ArgumentParser(description=progDescribtion, prog='Color Snitch')
 
 parser.add_argument('-r','--run', action='store_true', default=False, help='run "snitch list" and use it as input')
 parser.add_argument('--count', action='store_true', default=False, help='Print the priority')
+parser.add_argument('--version', action='version', version=f'%(prog)s {version}')
 
 
 args = parser.parse_args()
