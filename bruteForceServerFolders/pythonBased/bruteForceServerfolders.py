@@ -90,6 +90,10 @@ def main(characterList):
 
     args = parser.parse_args()
 
+    # check if the last character in the url is an /
+    if args.url[-1] != '/':
+        args.url = args.url + '/'
+
     print('Base Url: ' + args.url)
 
     # checks if the resultsfolder exists
