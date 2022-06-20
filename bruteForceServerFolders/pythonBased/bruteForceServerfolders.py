@@ -17,12 +17,14 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+
 def getCurrentTime():
     currentTime = time.localtime()
     t = ''
     for atr in currentTime:
         t = t + '_' + str(atr)
     return(t)
+
 
 directoryName = 'Results'
 directoryNameHelp = 'Uses the specified directory to store the results of the brute force attempt. The default name is "Brute Force Results".'
@@ -38,41 +40,60 @@ ColorHelp = 'The script will use color codes (https://stackoverflow.com/question
 
 urlsFound = 0
 
+
 def bruteforce(charset, maxlength):
-    return (''.join(candidate)
-        for candidate in chain.from_iterable(product(charset, repeat=i)
-        for i in range(1, maxlength + 1)))
+    """Returns a generator that yields all possible strings smaller or equall in length as the given maxlength"""
+    attemptList = (''.join(candidate)
+            for candidate in chain.from_iterable(product(charset, repeat=i)
+                                                 for i in range(1, maxlength + 1)))
+    return attemptList
+
 
 def checkIfFolderExists(folder):
     if os.path.exists(folder) == False:
         os.mkdir(folder)
 
-def checkUrl(url,dName,fName):
-    global urlsFound # so that the variable can be used in the function, since it is outside the scope
+
+def checkUrl(url, dName, fName):
+    # so that the variable can be used in the function, since it is outside the scope
+    global urlsFound
     r = requests.get(url)
-    if (r.status_code >= 200 and r.status_code <= 299):             #r.status_code --> Http responsecode (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+    # r.status_code --> Http responsecode (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+    if (r.status_code >= 200 and r.status_code <= 299):
         urlsFound = urlsFound + 1
-        print(bcolors.OKGREEN + '----------found Url: ' + url +'----------' + bcolors.ENDC)
-        f = open(dName + '/' + fName, 'at')            #opens File/creates it if it doesnt exist already and writes URL in it
+        print(bcolors.OKGREEN + 'Found Url: ' + url + bcolors.ENDC)
+        # opens File/creates it if it doesnt exist already and writes URL in it
+        f = open(dName + '/' + fName, 'at')
         f.write(url + '\n')
         f.close
     else:
-        print('checking Url: ' + url +' -- Did not work.' + 'Urls found: '+ str(urlsFound))
-        
+        print('checking Url: ' + url + ' -- Did not work.' +
+              ' Urls found: ' + str(urlsFound))
+
+
 def main(characterList):
-    parser = argparse.ArgumentParser()      #automaticly creates a help message! Thats FUCKING AWESOME!!!
-    parser.add_argument('-d','--directory-name', help=directoryNameHelp, default=directoryName)
-    parser.add_argument('-f','--file-name', help=fileNameHelp, default=fileName)
-    parser.add_argument('-m','--max-length', help=maxLengthHelp, type=int, default=maxLength)
-    parser.add_argument('url',help=urlHelp)
-    parser.add_argument('-c', '--character-list', help=characterListHelp, default=characterList)
-    parser.add_argument('-n','--no-color',help=ColorHelp, default=False, action='store_true')
+    # automaticly creates a help message! Thats FUCKING AWESOME!!!
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--directory-name',
+                        help=directoryNameHelp, default=directoryName)
+    parser.add_argument('-f', '--file-name',
+                        help=fileNameHelp, default=fileName)
+    parser.add_argument('-m', '--max-length',
+                        help=maxLengthHelp, type=int, default=maxLength)
+    parser.add_argument('-s', '--starting-point',
+                        help='The starting point for the brute force attempt. The default is the first character in the character list.', type=str, default=characterList[0])
+    parser.add_argument('url', help=urlHelp)
+    parser.add_argument('-c', '--character-list',
+                        help=characterListHelp, default=characterList)
+    parser.add_argument('-n', '--no-color', help=ColorHelp,
+                        default=False, action='store_true')
 
     args = parser.parse_args()
-    
+
     print('Base Url: ' + args.url)
-    
-    checkIfFolderExists(args.directory_name) #checks if the resultsfolder exists
+
+    # checks if the resultsfolder exists
+    checkIfFolderExists(args.directory_name)
 
     if args.no_color == True:
         bcolors.OKGREEN = ''
@@ -89,16 +110,32 @@ def main(characterList):
         if "p" in args.character_list:
             characterList = characterList + string.punctuation
         if "a" in args.character_list:
-            characterList = string.ascii_uppercase + string.ascii_lowercase +string.digits + string.punctuation
+            characterList = string.ascii_uppercase + \
+                string.ascii_lowercase + string.digits + string.punctuation
+    if (len(args.starting_point) > args.max_length):
+        print('\n\nThe starting point is longer than the max length\n')
+        exit()
 
-    for attempt in bruteforce(characterList, args.max_length):     #bruteforces all possible Urls
-        url = args.url + attempt
-        checkUrl(url,args.directory_name, args.file_name)
+    # bruteforces all possible Urls
+    for attempt in bruteforce(characterList, args.max_length):
+        # if a starting point is given, it will start from that point
+        if args.starting_point != characterList[0]:
+            if attempt == args.starting_point:
+                checkUrl(args.url + attempt, args.directory_name, args.file_name)
+                # resets the starting point to the first character in the character list to ensure that the script will not stop and continue like normal
+                args.starting_point = characterList[0]
+        else:
+            checkUrl(args.url + attempt, args.directory_name, args.file_name)
 
     print('\n\nThat was everything ;)\n')
 
 
 if __name__ == "__main__":
-    main(characterList)
-
-
+    try:
+        main(characterList)
+    except KeyboardInterrupt:
+        print('\n\n Script was cancelled\n')
+        exit()
+    except Exception as e:
+        print('\n\n Script failed with error: ' + str(e) + '\n')
+        exit()
