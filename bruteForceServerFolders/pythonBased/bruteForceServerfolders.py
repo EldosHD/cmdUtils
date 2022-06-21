@@ -39,7 +39,7 @@ urlHelp = 'Uses the specified Url as the base for the brute force attempt. This 
 characterList = string.ascii_letters
 characterListHelp = 'The default list are the upper and lowercase ascii letters. If you want to specify your own character List you can combine the following: l for lowercase, u for uppercase, d for digits, p for punktuation or a for all of them.'
 ColorHelp = 'The script will use color codes (https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal) to dye the output in case an Url is found. The --no-color option disables that. This only works with an registry Tweak on Windows.'
-
+version = '1.0.0'
 urlsFound = 0
 
 
@@ -107,6 +107,8 @@ def main(characterList):
     parser.add_argument('-n', '--no-color', help=ColorHelp,
                         default=False, action='store_true')
     parser.add_argument('--test', help='Just a quicked way to start the script for testing.', action='store_true')
+
+    parser.add_argument('--version', action='version', version=version)
 
     args = parser.parse_args()
 
