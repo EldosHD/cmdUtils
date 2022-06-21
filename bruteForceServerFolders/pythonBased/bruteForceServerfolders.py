@@ -75,6 +75,7 @@ def checkUrl(url, dName, fName, maxTries):
 def main(characterList):
     # automaticly creates a help message! Thats FUCKING AWESOME!!!
     parser = argparse.ArgumentParser()
+    parser.add_argument('url', nargs='?', help=urlHelp, type=str, default='')
     parser.add_argument('-d', '--directory-name',
                         help=directoryNameHelp, default=directoryName)
     parser.add_argument('-f', '--file-name',
@@ -83,16 +84,27 @@ def main(characterList):
                         help=maxLengthHelp, type=int, default=maxLength)
     parser.add_argument('-s', '--starting-point',
                         help='The starting point for the brute force attempt. The default is the first character in the character list.', type=str, default=characterList[0])
-    parser.add_argument('url', help=urlHelp)
     parser.add_argument('-c', '--character-list',
                         help=characterListHelp, default=characterList)
     parser.add_argument(
         '-t', '--max-tries', help='The maximum number of tries per url. The default is 1.', type=int, default=1)
     parser.add_argument('-n', '--no-color', help=ColorHelp,
                         default=False, action='store_true')
+    parser.add_argument('--test', help='Just a quicked way to start the script for testing.', action='store_true')
 
     args = parser.parse_args()
 
+    if args.test:
+        args.url = 'https://www.google.com/'
+        args.max_length = 2
+        args.character_list = 'l'
+        args.max_tries = 2
+        args.directory_name = 'test'
+        args.file_name = 'test.txt'
+    
+    if args.url == '':
+        print('No url given. Please use the -h option to see the help message.')
+        return
     # check if the last character in the url is an /
     if args.url[-1] != '/':
         args.url = args.url + '/'
