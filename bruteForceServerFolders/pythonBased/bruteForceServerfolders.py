@@ -64,7 +64,7 @@ def checkUrl(url, dName, fName, maxTries):
             urlsFound = urlsFound + 1
             with open(dName + '/' + fName, 'a') as f:
                 f.write('Response: ' + str(r.status_code) +
-                        'url: ' + url + '\n')
+                        ' url: ' + url + '\n')
                 f.close()
                 print(f'{bcolors.OKGREEN} Response: {r.status_code} url: {url}{bcolors.ENDC}')
                 return True
