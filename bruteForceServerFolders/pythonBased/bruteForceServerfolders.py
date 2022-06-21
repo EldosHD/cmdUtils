@@ -78,7 +78,13 @@ def checkUrl(url, dName, fName, maxTries):
                 f.close()
                 print(f'{bcolors.OKGREEN} Response: {r.status_code} url: {url}{bcolors.ENDC}')
                 return True
-    print('url: ' + url + ' did not work.')
+        elif r.status_code != 200 and r.status_code != 404:
+            with open(dName + '/' + fName, 'a') as f:
+                f.write('Response: ' + str(r.status_code) +
+                        ' url: ' + url + '\n')
+                f.close()
+                print(f'{bcolors.WARNING} Response: {r.status_code} url: {url}{bcolors.ENDC}')
+    print(f' Response: {r.status_code} url: {url}')
     return False
 
 
