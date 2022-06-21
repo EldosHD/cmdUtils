@@ -10,10 +10,17 @@ This is just a simple bash script that displays a "ball" bouncing horizontally a
 
 ## Bruteforce serverfolders
 
+This is a simple script that tries to find all possible urls on a server via bruteforce. There is not really a point to it allthough. The only real use is to find folders that were left public by accident and access the files in them. You have to specify an url in the format of `https://www.google.com/`. Use the `-h` flag to view all the possible options.
+
 Ignore the rust version. I didn't build it.
 But the python version works.
 
-This script tries to figure out the urls of existing folders on a server with brute force. You have to specify an url in the format of `https://www.google.com/`. Use the `-h` flag to view all the possible options.
+### Installation
+
+```bash
+git clone https://github.com/EldosHD/cmdUtils.git
+pip install -r cmdUtils/bruteForceServerFolders/pythonBased/requirements.txt
+```
 
 ## Color Snitch
 
