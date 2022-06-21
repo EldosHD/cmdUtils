@@ -17,6 +17,8 @@ But the python version works.
 
 ### Installation
 
+A binary release can be found under [releases](https://github.com/EldosHD/cmdUtils/releases/tag/v1.0.0)
+
 ```bash
 git clone https://github.com/EldosHD/cmdUtils.git
 pip install -r cmdUtils/bruteForceServerFolders/pythonBased/requirements.txt
@@ -26,9 +28,11 @@ pip install -r cmdUtils/bruteForceServerFolders/pythonBased/requirements.txt
 
 This script runs and color the output of [snitch](https://github.com/tsoding/snitch). You can either pipe the output of `snitch list` to `colorSnitch` or you can use the `-r` flag to run it directly. Use the `-h` flag to view all the possible options. A binary release can be found under [releases](https://github.com/EldosHD/cmdUtils/releases).
 
+## Binarys
+
 NOTE: The binary was build under `Ubuntu 20.04` with `Python3.8.10`. To build the binary yourself use [pyinstaller](https://pyinstaller.org/en/stable/operating-mode.html). You can do that with: 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile colorSnitch.py
+pyinstaller --onefile SCRIPTNAME.py
 ```
 The binary will be placed in the `dist` folder.

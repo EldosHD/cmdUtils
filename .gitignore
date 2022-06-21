@@ -3,4 +3,11 @@ bruteForceServerFolders/pythonBased/Results/
 bruteForceServerFolders/pythonBased/test/
 */build/
 */dist/
+*/__pycache__/
+*/*/build/
+*/*/dist/
+*/*/__pycache__/
+*.spec
 colorSnitch/colorSnitch.spec
+
+
