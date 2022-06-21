@@ -6,6 +6,7 @@ from itertools import chain, product
 import string
 import argparse
 import time
+import errno
 
 
 class bcolors:
@@ -59,7 +60,16 @@ def checkUrl(url, dName, fName, maxTries):
     """Checks if the url is valid a given number of times and if it is, it will write it to the file."""
     global urlsFound
     for i in range(1, maxTries + 1):
-        r = requests.get(url)
+        try:
+            r = requests.get(url)
+        except requests.exceptions.ConnectionError:
+            print(f'{bcolors.FAIL}The script failed with a no connection error. Check your internet connection.{bcolors.ENDC}\n\n')
+            traceback.print_exc()
+            exit()
+        except Exception as e:
+            print(bcolors.FAIL + 'Error: ' + str(e) + bcolors.ENDC)
+            break
+
         if r.status_code == 200:
             urlsFound = urlsFound + 1
             with open(dName + '/' + fName, 'a') as f:
