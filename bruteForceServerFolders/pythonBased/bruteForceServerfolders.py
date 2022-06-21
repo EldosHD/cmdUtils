@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import traceback
 import requests
 import os
 from itertools import chain, product
@@ -44,8 +45,8 @@ urlsFound = 0
 def bruteforce(charset, maxlength):
     """Returns a generator that yields all possible strings smaller or equall in length as the given maxlength"""
     attemptList = (''.join(candidate)
-            for candidate in chain.from_iterable(product(charset, repeat=i)
-                                                 for i in range(1, maxlength + 1)))
+                   for candidate in chain.from_iterable(product(charset, repeat=i)
+                                                        for i in range(1, maxlength + 1)))
     return attemptList
 
 
@@ -54,21 +55,21 @@ def checkIfFolderExists(folder):
         os.mkdir(folder)
 
 
-def checkUrl(url, dName, fName):
-    # so that the variable can be used in the function, since it is outside the scope
+def checkUrl(url, dName, fName, maxTries):
+    """Checks if the url is valid a given number of times and if it is, it will write it to the file."""
     global urlsFound
-    r = requests.get(url)
-    # r.status_code --> Http responsecode (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
-    if (r.status_code >= 200 and r.status_code <= 299):
-        urlsFound = urlsFound + 1
-        print(bcolors.OKGREEN + 'Found Url: ' + url + bcolors.ENDC)
-        # opens File/creates it if it doesnt exist already and writes URL in it
-        f = open(dName + '/' + fName, 'at')
-        f.write(url + '\n')
-        f.close
-    else:
-        print('checking Url: ' + url + ' -- Did not work.' +
-              ' Urls found: ' + str(urlsFound))
+    for i in range(1, maxTries + 1):
+        r = requests.get(url)
+        if r.status_code == 200:
+            urlsFound = urlsFound + 1
+            with open(dName + '/' + fName, 'a') as f:
+                f.write('Response: ' + str(r.status_code) +
+                        'url: ' + url + '\n')
+                f.close()
+                print(f'{bcolors.OKGREEN} Response: {r.status_code} url: {url}{bcolors.ENDC}')
+                return True
+    print('url: ' + url + ' did not work.')
+    return False
 
 
 def main(characterList):
@@ -85,6 +86,8 @@ def main(characterList):
     parser.add_argument('url', help=urlHelp)
     parser.add_argument('-c', '--character-list',
                         help=characterListHelp, default=characterList)
+    parser.add_argument(
+        '-t', '--max-tries', help='The maximum number of tries per url. The default is 1.', type=int, default=1)
     parser.add_argument('-n', '--no-color', help=ColorHelp,
                         default=False, action='store_true')
 
@@ -125,11 +128,13 @@ def main(characterList):
         # if a starting point is given, it will start from that point
         if args.starting_point != characterList[0]:
             if attempt == args.starting_point:
-                checkUrl(args.url + attempt, args.directory_name, args.file_name)
+                checkUrl(args.url + attempt,
+                         args.directory_name, args.file_name, args.max_tries)
                 # resets the starting point to the first character in the character list to ensure that the script will not stop and continue like normal
                 args.starting_point = characterList[0]
         else:
-            checkUrl(args.url + attempt, args.directory_name, args.file_name)
+            checkUrl(args.url + attempt, args.directory_name,
+                     args.file_name, args.max_tries)
 
     print('\n\nThat was everything ;)\n')
 
@@ -142,4 +147,5 @@ if __name__ == "__main__":
         exit()
     except Exception as e:
         print('\n\n Script failed with error: ' + str(e) + '\n')
+        traceback.print_exc()
         exit()
