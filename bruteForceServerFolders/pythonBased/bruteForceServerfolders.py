@@ -34,16 +34,17 @@ fileNameHelp = 'Uses the specified file to store the results of the brute force 
 maxLength = 4
 maxLengthHelp = 'Uses the specified integer as the maximum length of the bute force attempt. The maxLength is 4 by default.'
 url = ''
+specialChars = '-._/'
 urlHelp = 'Uses the specified Url as the base for the brute force attempt. This must be a complete link like https://www.google.com/. The https:// must be included.'
 characterList = string.ascii_letters
 characterListHelp = 'The default list are the upper and lowercase ascii letters. If you want to specify your own character List you can combine the following: l for lowercase, u for uppercase, d for digits, p for punktuation or a for all of them.'
 ColorHelp = 'The script will use color codes (https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal) to dye the output in case an Url is found. The --no-color option disables that. This only works with an registry Tweak on Windows.'
-version = '1.0.1'
+version = '1.0.2'
 urlsFound = 0
 
 headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 
-def bruteforce(charset, maxlength):
+def getPossibleAttempts(charset, maxlength):
     """Returns a generator that yields all possible strings smaller or equall in length as the given maxlength"""
     attemptList = (''.join(candidate)
                    for candidate in chain.from_iterable(product(charset, repeat=i)
@@ -65,10 +66,14 @@ def checkUrl(url, dName, fName, maxTries):
             r = requests.get(url, headers=headers)
         except requests.exceptions.ConnectionError:
             print(f'{bcolors.FAIL}The script failed with a no connection error. Check your internet connection.{bcolors.ENDC}\n\n')
+            print('Last Url: ' + url)
             traceback.print_exc()
             exit()
         except Exception as e:
-            print(bcolors.FAIL + 'Error: ' + str(e) + bcolors.ENDC)
+            print(f'\n{bcolors.FAIL}The script failed with an unknown error.{bcolors.ENDC}\n\n')
+            print('\n' + bcolors.FAIL + 'Error: ' + str(e) + bcolors.ENDC)
+            print('Last Url: ' + url + '\n\n')
+            traceback.print_exc()
             break
 
         if (r.status_code == 200):
@@ -97,12 +102,13 @@ def main(characterList):
                         help=directoryNameHelp, default=directoryName)
     parser.add_argument('-f', '--file-name',
                         help=fileNameHelp, default=fileName)
-    parser.add_argument('-m', '--max-length',
+    parser.add_argument('-l', '--max-length',
                         help=maxLengthHelp, type=int, default=maxLength)
     parser.add_argument('-s', '--starting-point',
                         help='The starting point for the brute force attempt. The default is the first character in the character list.', type=str, default=characterList[0])
     parser.add_argument('-c', '--character-list',
                         help=characterListHelp, default=characterList)
+    parser.add_argument('--extra-characters', help='Adds extra characters to the character list. The default extra characters are "-" "_" "." "/"', default='')
     parser.add_argument(
         '-t', '--max-tries', help='The maximum number of tries per url. The default is 1.', type=int, default=1)
     parser.add_argument('-n', '--no-color', help=ColorHelp,
@@ -116,7 +122,7 @@ def main(characterList):
     if args.test:
         args.url = 'https://www.google.com/'
         args.max_length = 2
-        args.character_list = 'l'
+        args.character_list = 'a'
         args.max_tries = 2
         args.directory_name = 'test'
         args.file_name = 'test.txt'
@@ -140,22 +146,24 @@ def main(characterList):
     if (args.character_list != string.ascii_letters):
         characterList = ''
         if "l" in args.character_list:
-            characterList = characterList + string.ascii_lowercase
+            characterList += string.ascii_lowercase
         if "u" in args.character_list:
-            characterList = characterList + string.ascii_uppercase
+            characterList += string.ascii_uppercase
         if "d" in args.character_list:
-            characterList = characterList + string.digits
+            characterList += string.digits
         if "p" in args.character_list:
-            characterList = characterList + string.punctuation
+            characterList += specialChars
         if "a" in args.character_list:
-            characterList = string.ascii_uppercase + \
-                string.ascii_lowercase + string.digits + string.punctuation
+            characterList = string.ascii_lowercase + string.ascii_uppercase +string.digits + specialChars
+        characterList += args.extra_characters
+    print('Character List: ' + characterList)
+    
     if (len(args.starting_point) > args.max_length):
         print('\n\nThe starting point is longer than the max length\n')
         exit()
 
     # bruteforces all possible Urls
-    for attempt in bruteforce(characterList, args.max_length):
+    for attempt in getPossibleAttempts(characterList, args.max_length):
         # if a starting point is given, it will start from that point
         if args.starting_point != characterList[0]:
             if attempt == args.starting_point:
