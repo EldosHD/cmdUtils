@@ -72,7 +72,7 @@ def checkUrl(url, dName, fName, maxTries):
             print(bcolors.FAIL + 'Error: ' + str(e) + bcolors.ENDC)
             break
 
-        if r.status_code == 200:
+        if (r.status_code == 200):
             urlsFound = urlsFound + 1
             with open(dName + '/' + fName, 'a') as f:
                 f.write('Response: ' + str(r.status_code) +
@@ -80,7 +80,7 @@ def checkUrl(url, dName, fName, maxTries):
                 f.close()
                 print(f'{bcolors.OKGREEN} Response: {r.status_code} url: {url}{bcolors.ENDC}')
                 return True
-        elif r.status_code != 200 and r.status_code != 404:
+        elif (r.status_code != 200 and r.status_code not in range(400, 500)): # numbers from 400 to 499
             with open(dName + '/' + fName, 'a') as f:
                 f.write('Response: ' + str(r.status_code) +
                         ' url: ' + url + '\n')
