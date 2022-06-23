@@ -42,6 +42,7 @@ ColorHelp = 'The script will use color codes (https://stackoverflow.com/question
 version = '1.0.0'
 urlsFound = 0
 
+headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 
 def bruteforce(charset, maxlength):
     """Returns a generator that yields all possible strings smaller or equall in length as the given maxlength"""
@@ -61,7 +62,8 @@ def checkUrl(url, dName, fName, maxTries):
     global urlsFound
     for i in range(1, maxTries + 1):
         try:
-            r = requests.get(url)
+            # adds a dummy header information to the request to prevent the server from blocking the request
+            r = requests.get(url, headers=headers)
         except requests.exceptions.ConnectionError:
             print(f'{bcolors.FAIL}The script failed with a no connection error. Check your internet connection.{bcolors.ENDC}\n\n')
             traceback.print_exc()
